@@ -1,0 +1,41 @@
+---
+title: "Stochastic gradient descent"
+author:
+  - VO Van Nghia
+  - PHAM Tuan Kiet
+abstract: |
+    Stochastic gradient descent is an iterative method for optimizing an objective function regarded as a stochastic approximation of gradient descent optimization. Since it replaces the actual gradient (calculated from the entire data set) by an estimate thereof (calculated from a randomly selected subset of the data). Especially in high-dimensional optimization problems this reduces the very high computational burden, achieving faster iterations in trade for a lower convergence rate.
+classoption: a4paper
+geometry: margin=2.5cm
+output:    
+    bookdown::pdf_document2:
+        papersize: a4
+        highlight: tango
+        keep_tex: true
+        toc: false
+        latex_engine: lualatex
+        includes:
+            in_header: preamble.tex
+urlcolor: blue
+---
+
+# Gradient descent
+
+An approximate and iterative technique for mathematical optimization is the gradient descent algorithm. It can be used to approach any differentiable function's minimum. For a better imagination about the algorithm, the process is someho the same as a dropping drip of water following the slope.
+
+The main problem of this algorithm is that sometimes the solution falls into a local minimum point or a saddle point instead of the desired global minimum.  It is frequently used internally by data science and machine learning to optimize model parameters. For instance, gradient descent is used by neural networks to find weights and biases.
+
+```{r echo=FALSE, out.width = "30%",fig.cap = "Impact of learning rate", fig.show = "hold", fig.align = "default"}
+knitr::include_graphics(c("img/gd-1.png","img/gd-2.png","img/gd-3.png"))
+```
+
+Learning rate is a very important parameter that affects the perfomance of the algorithm. Right here is an example showing how this value influences a process of gradient descent. With a too small rate, the algorithm seems to be far away from the desired result even after a large alount of iteration. However, a high learning rate doesn't give a better performance as it cannot approach the local minimum.
+
+# Stochastic gradient descent
+As you can see, a higher learning rate leads to faster convergence speed at the very first iterations but a lower convergence rate as the iteration rises. Stochastic gradient descent is an improved version of gradient descent which modified the learning rate throughout the process in order to reduce the computation burden as a trade of convergence rate.
+
+Stochastic gradient descent begins with an initial vector of decision variables and updates it over a number of iterations, much like in the case of the ordinary gradient descent. What takes place during the iterations differs between the two:
+
+- Stochastic gradient descent randomly divides the set of observations into minibatches
+- The gradient is calculated and the vector is moved for each minibatch.
+- You can declare that an iteration, or epoch, is complete when all minibatches have been used and move on to the next one.
