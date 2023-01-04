@@ -92,29 +92,116 @@ Stochastic gradient descent is an iterative method for optimizing an objective f
 \hypertarget{gradient-descent}{%
 \section{Gradient descent}\label{gradient-descent}}
 
-An approximate and iterative technique for mathematical optimization is the gradient descent algorithm. It can be used to approach any differentiable function's minimum. For a better imagination about the algorithm, the process is someho the same as a dropping drip of water following the slope.
+An approximate and iterative technique for mathematical optimization is the gradient descent algorithm. It can be used to approach any differentiable function's minimum. For a better imagination about the algorithm, the process is someho the same as a dropping drip of water following the slope. During the process of the algorithm, the new position for eaxh iteration is determined by: \[x_{n+1} = x_n + - \tau \nabla f(x)\]
 
 The main problem of this algorithm is that sometimes the solution falls into a local minimum point or a saddle point instead of the desired global minimum. It is frequently used internally by data science and machine learning to optimize model parameters. For instance, gradient descent is used by neural networks to find weights and biases.
 
 \begin{figure}
-\includegraphics[width=0.3\linewidth]{img/gd-1} \includegraphics[width=0.3\linewidth]{img/gd-2} \includegraphics[width=0.3\linewidth]{img/gd-3} \caption{Impact of learning rate}\label{fig:unnamed-chunk-1}
+
+{\centering \includegraphics[width=0.3\linewidth]{img/gd-1} \includegraphics[width=0.3\linewidth]{img/gd-2} \includegraphics[width=0.3\linewidth]{img/gd-3} 
+
+}
+
+\caption{Impact of learning rate}\label{fig:unnamed-chunk-1}
 \end{figure}
 
-Learning rate is a very important parameter that affects the perfomance of the algorithm. Right here is an example showing how this value influences a process of gradient descent. With a too small rate, the algorithm seems to be far away from the desired result even after a large alount of iteration. However, a high learning rate doesn't give a better performance as it cannot approach the local minimum.
+Learning rate (\(\tau\)) is a very important parameter that affects the perfomance of the algorithm. Right here is an example showing how this value influences a process of gradient descent. With a too small rate, the algorithm seems to be far away from the desired result even after a large alount of iteration. However, a high learning rate doesn't give a better performance as it cannot approach the local minimum.
 
 \hypertarget{stochastic-gradient-descent}{%
 \section{Stochastic gradient descent}\label{stochastic-gradient-descent}}
 
-Stochastic gradient descent begins with an initial vector of decision variables and updates it over a number of iterations, much like in the case of the ordinary gradient descent. What takes place during the iterations differs between the two:
+\begin{figure}
 
-\begin{itemize}
-\tightlist
-\item
-  Stochastic gradient descent randomly divides the set of observations into minibatches
-\item
-  The gradient is calculated and the vector is moved for each minibatch.
-\item
-  You can declare that an iteration, or epoch, is complete when all minibatches have been used and move on to the next one.
-\end{itemize}
+{\centering \includegraphics[width=0.6\linewidth]{img/gd-4} 
+
+}
+
+\caption{Impact of learning rate}\label{fig:unnamed-chunk-2}
+\end{figure}
+
+As you can see, a higher learning rate leads to faster convergence speed at the very first iterations but a lower convergence rate as the iteration rises. Stochastic gradient descent is an improved version of gradient descent which modified the learning rate throughout the process in order to reduce the computation burden as a trade of convergence rate due to the learning rate converges to \(0\).
+
+For very large \(n\) (which could in theory even be infinite, in which case the sum needs to be replaced
+by an expectation or equivalenty an integral), computing \(\nabla E\) is prohebitive.
+It is possible instead to use a stochastic gradient descent (SGD) scheme
+\[ w_{\ell+1} = w_\ell - \tau_\ell \nabla E_{i(\ell)}(w_\ell) \]
+where, for each iteration index \(\ell\), \(i(\ell)\)
+is drawn uniformly at random in \(\{1,\ldots,n\}\)
+
+In this example, we are using a stochatics algorithm with \[ \tau_\ell \eqdef \frac{\tau_0}{1 + \ell/\ell_0} \]
+where \(\ell_0\) indicates roughly the number of iterations serving as a
+``warmup'' phase.
+
+As compared to a normal Gradient Descent algorithm, the SGD algorithm out-performs for the first iterations with faster speed of convergence.
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.6\linewidth]{img/SGD_vs_GD} 
+
+}
+
+\caption{SGD performance}\label{fig:unnamed-chunk-3}
+\end{figure}
+
+\hypertarget{improvement-of-stochatics-gradient-descent-algorithm}{%
+\section{Improvement of Stochatics Gradient Descent Algorithm}\label{improvement-of-stochatics-gradient-descent-algorithm}}
+
+As we all know that the normal SGD (Stochatics Gradient Descent) algorithm is slow due to its fast decay of the the learning rate (\(\tau\)). To enhance its performance, there are alternatives that help solve the weakness of SGD.
+
+\hypertarget{sgd-with-averaging}{%
+\subsection{SGD with Averaging}\label{sgd-with-averaging}}
+
+To improve somehow the convergence speed, it is possible to average the past
+iterate, i.e.~run a ``classical'' SGD on auxiliary variables:
+
+\[ \tilde w_{\ell+1} = \tilde w_\ell - \tau_\ell \nabla E_{i(\ell)}(\tilde w_\ell) \]
+
+and output as estimated weight vector the average
+\[ w_\ell \eqdef \frac{1}{\ell} \sum_{k=1}^\ell \tilde w_\ell. \]
+This defines the Stochastic Gradient Descent with Averaging (SGA)
+algorithm. And in this case, the learning rate is define as: \[ \tau_\ell \eqdef \frac{\tau_0}{1 + \sqrt{\ell/\ell_0}}. \]
+
+Typically, because the averaging stabilizes the iterates, the choice of
+\((\ell_0,\tau_0)\) is less important than for SGD.
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.6\linewidth]{img/SGD_vs_GD} 
+
+}
+
+\caption{SGD vs SGDA}\label{fig:unnamed-chunk-4}
+\end{figure}
+
+\hypertarget{stochatics-averaged-gradient-descent}{%
+\subsection{Stochatics Averaged Gradient Descent}\label{stochatics-averaged-gradient-descent}}
+
+SGD and SGA can be extended to infinite \(n\) and more general minimization of
+expectations. However, with a finite value of \(n\), another improved algorithm performs better. That's is the \href{https://arxiv.org/pdf/1309.2388.pdf}{Stochatics Averaged Gradient Descent}(or SAGD).
+
+The algorithm reads
+\[ h \leftarrow \nabla E_{i(\ell)}(\tilde w_\ell), \]
+\[ g  \leftarrow g - G^{i(\ell)} + h,   \]
+\[ G^{i(\ell)} \leftarrow h,  \]
+\[ w_{\ell+1} = w_\ell - \tau g.  \]
+Note that in contrast to SGD and SGA, this method uses a fixed step size \(\tau\). Similarely to the the normal GD, in order to ensure convergence, the step size \(\tau\) should be of the order of \(1/L\) where \(L\) is the Lipschitz constant of \(E\). A fixed step size means better rate of convergence in comparison to a 0-converge rate with a finite number of iterations.
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.6\linewidth]{img/SAGD} 
+
+}
+
+\caption{SAGD performance}\label{fig:unnamed-chunk-5}
+\end{figure}
+
+As you can see in the plot, a fixed step leads to better convergence rate in spite of the low convergence speed at the very first iterations. However, with the adaptation of each iteration, the SAGD still out performs the normal Gradient Descent algorithm.
+
+\hypertarget{pros-and-cons-of-sgd}{%
+\section{Pros and Cons of SGD}\label{pros-and-cons-of-sgd}}
+
+In order to significantly speed up parameter updating, this approach randomly optimizes the loss function on a sample of training data rather than the loss function on the entire set of training data.
+
+The SGD performs frequent updates with large variance, causing the objective function to vary significantly. That's why we often see the result of a SGD algorithm is covered with noise. The variability of SGD, on the other hand, allows it to reach new and potentially superior local minima. However, as SGD continues to overshoot, convergence to the exact minimum becomes more difficult without proper learning rate.
 
 \end{document}
